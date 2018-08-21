@@ -9,20 +9,22 @@ import org.springframework.stereotype.Component;
 
 import com.capgemini.model.Category;
 import com.capgemini.model.Product;
+import com.capgemini.model.ProductSummary;
 import com.capgemini.repository.CategoryInventoryRepository;
 import com.capgemini.repository.ProductInventoryRepository;
+
 @Component
-public class ManagingInventoryImpl implements IManagingInventory{
-	
+public class ManagingInventoryImpl implements IManagingInventory {
+
 	@Autowired
 	ProductInventoryRepository productInventoryRepository;
 	@Autowired
 	CategoryInventoryRepository categoryInventoryRepository;
 
 	@Override
-	public List<Product> displayListOfProducts(int categoryId) {
-		
-		return productInventoryRepository.displayListOfProducts(categoryId);
+	public List<Product> displayListOfProducts() {
+		return productInventoryRepository.findAll();
+		// return productInventoryRepository.displayListOfProducts();
 	}
 
 	@Override
@@ -34,7 +36,6 @@ public class ManagingInventoryImpl implements IManagingInventory{
 
 	@Override
 	public Product editExistingProductDetails(Product product) {
-		
 		product.setStartTime(Date.valueOf(LocalDate.now()));
 		return productInventoryRepository.save(product);
 	}
@@ -42,7 +43,7 @@ public class ManagingInventoryImpl implements IManagingInventory{
 	@Override
 	public void removeExistingProduct(int productId) {
 		productInventoryRepository.deleteById(productId);
-		
+
 	}
 
 	@Override
@@ -59,7 +60,30 @@ public class ManagingInventoryImpl implements IManagingInventory{
 	@Override
 	public void removeExistingCategory(int categoryId) {
 		categoryInventoryRepository.deleteById(categoryId);
-		
+
+	}
+
+	@Override
+	public Product getProductdetails(int id) {
+
+		return productInventoryRepository.getOne(id);
+	}
+
+	@Override
+	public Product validateProduct(Product product) {
+		String status = product.getStatus();
+		if (status.matches("accept")) {
+			product.setStatus("Approved");
+			return productInventoryRepository.save(product);
+
+		}
+		return null;
+	}
+
+	@Override
+	public List<Product> displayListOfNotApprovedProducts() {
+
+		return productInventoryRepository.displayListOfNotApprovedProducts();
 	}
 
 }
